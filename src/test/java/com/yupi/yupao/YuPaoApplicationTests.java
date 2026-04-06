@@ -13,7 +13,7 @@ import java.security.NoSuchAlgorithmException;
  * @from <a href="https://yupi.icu">编程导航知识星球</a>
  */
 @SpringBootTest
-class UserCenterApplicationTests {
+class YuPaoApplicationTests {
 
     // https://yupi.icu/
 

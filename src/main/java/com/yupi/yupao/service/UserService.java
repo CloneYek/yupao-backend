@@ -59,4 +59,12 @@ public interface UserService extends IService<User> {
      * @return
      */
     List<User> searchUsersByTags(List<String> tagNameList);
+
+    int updateUser(User user, User loginUser);
+
+    User getLoginUser(HttpServletRequest request);
+
+    boolean isAdmin(HttpServletRequest request);
+
+    boolean isAdmin(User loginUser);
 }

@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.yupi.yupao.contant.UserConstant.ADMIN_ROLE;
 import static com.yupi.yupao.contant.UserConstant.USER_LOGIN_STATE;
 
 /**
@@ -248,5 +249,68 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }).map(this::getSafetyUser).collect(Collectors.toList());
     }
 
+    /**
+     * 更新用户信息
+     *
+     * @param user
+     * @param loginUser
+     * @return
+     */
+    @Override
+    public int updateUser(User user, User loginUser) {
+        //管理员和自己能修改
+        long userId = user.getId();
+        if (userId <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        //todo 补充校验 如果用户没有传任何参数就更新，就直接报错
+
+        //如果是管理员，允许更新任意用户
+        //如果不是管理员，只能更新自己的
+        if (!isAdmin(loginUser) && user.getId() != loginUser.getId()) {
+            throw new BusinessException(ErrorCode.NO_AUTH);
+        }
+        User oldUser = userMapper.selectById(userId);
+        if (oldUser == null) {
+            throw new BusinessException(ErrorCode.NULL_ERROR);
+        }
+        return userMapper.updateById(user);
+    }
+
+    @Override
+    public User getLoginUser(HttpServletRequest request) {
+        if (request == null) {
+            return null;
+        }
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        if (userObj == null) {
+            throw new BusinessException(ErrorCode.NO_AUTH);
+        }
+        return (User) userObj;
+    }
+
+    /**
+     * 是否为管理员
+     *
+     * @param request
+     * @return
+     */
+    public boolean isAdmin(HttpServletRequest request) {
+        // 仅管理员可查询
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User user = (User) userObj;
+        return user != null && user.getUserRole() == ADMIN_ROLE;
+    }
+
+    /**
+     * 是否为管理员
+     *
+     * @param loginUser
+     * @return
+     */
+    public boolean isAdmin(User loginUser) {
+        // 仅管理员可查询
+        return loginUser.getUserRole() == ADMIN_ROLE && (loginUser != null);
+    }
 }
 

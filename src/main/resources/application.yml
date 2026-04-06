@@ -2,6 +2,9 @@
 #  <a href="https://github.com/liyupi">程序员鱼皮</a>
 # @from <a href="https://yupi.icu">编程导航知识星球</a>
 spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   application:
     name: yupao-backend
   # DataSource Config
@@ -13,10 +16,21 @@ spring:
   # session 失效时间
   session:
     timeout: 86400
+    store-type: redis
+  profiles:
+    active: dev
+  # redis配置
+  redis:
+    port: 6379
+    host: localhost
+    database: 0
 server:
   port: 8080
   servlet:
     context-path: /api
+    session:
+      cookie:
+        domain: localhost
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false
